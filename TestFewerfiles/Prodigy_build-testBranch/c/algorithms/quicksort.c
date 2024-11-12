@@ -1,16 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void print_arr(int *ptr, int size)
+void swap(int *a, int *b);
+int partition(int *a, int l, int h);
+void quick_sort(int *a, int l, int h);
+
+int main()
 {
-    putchar('[');
-    while (size--)
+    int size;
+    printf("Size: ");
+    scanf("%d", &size);
+
+    int *arr = malloc(size * sizeof(int));
+    printf("Array elements: ");
+    for (int i = 0; i < size; i++)
     {
-        printf("%d", *ptr++);
-        if (size)
-            putchar(',');
+        scanf("%d", &arr[i]);
     }
-    printf("]\n");
+
+    quick_sort(arr, 0, size - 1);
+
+    printf("Sorted array:");
+    for (int i = 0; i < size; i++)
+    {
+        printf(" %d", arr[i]);
+    }
+    printf("\n");
+
+    free(arr);
+    return 0;
 }
 
 void swap(int *a, int *b)
@@ -19,73 +37,38 @@ void swap(int *a, int *b)
     tmp = *a;
     *a = *b;
     *b = tmp;
+    return;
 }
 
-int *find_min(int *ptr, int size)
+int partition(int a[], int l, int h)
 {
-    int *min;
-    min = ptr;
-    while (size--)
-    {
-        if (*ptr < *min)
-            min = ptr;
-        ptr++;
-    }
-    return (min);
-}
+    int i = l, j = l, p = h;
 
-void selection_sort(int *ptr, int size)
-{
-    int *min;
-    while (--size)
+    while (i < h)
     {
-        if ((min = find_min(ptr + 1, size)))
+        if (a[i] < a[p])
         {
-            if (*ptr > *min)
-                swap(ptr, min);
+            swap(&a[i], &a[j]);
+            j++;
         }
-        ptr++;
+        i++;
     }
+
+    swap(&a[p], &a[j]);
+
+    return j;
 }
 
-void fill(char **av, int *ptr, int size)
+void quick_sort(int a[], int l, int h)
 {
-    int i;
-    i = 2;
-    while (av[i] && size--)
-        *ptr++ = atoi(av[i++]);
-}
+    int p;
 
-int main(int argc, char *argv[])
-{
-    if (argc < 3)
+    if (l < h)
     {
-        puts("Usage: ./your-executable-name [array size] [array]");
-        puts("Example: ./your-executable-name 3 2 1 0");
-        return EXIT_FAILURE;
+        p = partition(a, l, h);
+        quick_sort(a, l, p - 1);
+        quick_sort(a, p + 1, h);
     }
 
-    int size = atoi(argv[1]);
-    if (!size)
-    {
-        puts("Error: size of array can't be 0");
-        return EXIT_FAILURE;
-    }
-
-    int *arr = (int *)malloc(size * sizeof(int));
-    if (!arr)
-        return EXIT_FAILURE;
-
-    fill(argv, arr, size);
-
-    printf("Before sorting: ");
-    print_arr(arr, size);
-
-    selection_sort(arr, size);
-
-    printf("After sorting: ");
-    print_arr(arr, size);
-
-    free(arr);
-    return EXIT_SUCCESS;
+    return;
 }
